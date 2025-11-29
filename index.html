@@ -186,7 +186,6 @@
       const motor1 = toNumber("motor1");
       const motor2 = toNumber("motor2");
 
-      // Heater amps
       let heaterAmps = 0;
       if (voltage > 0 && heaterKw > 0) {
         if (phase === 3) {
@@ -199,12 +198,10 @@
       const motorTotal = motor1 + motor2;
       const totalAmps = heaterAmps + motorTotal;
 
-      // MCA values
       const heaterMca = 1.25 * heaterAmps;
       const motorMca = 1.25 * motorTotal;
       const totalMca = 1.25 * (motorTotal + heaterAmps);
 
-      // Wire size from total MCA (matches your K7 table)
       let wire;
       const k7 = totalMca;
       if (!isFinite(k7) || k7 <= 0) {
@@ -215,48 +212,4 @@
         wire = "16 AWG";
       } else if (k7 < 25) {
         wire = "14 AWG";
-      } else if (k7 < 30) {
-        wire = "12 AWG";
-      } else if (k7 < 40) {
-        wire = "12 AWG";
-      } else if (k7 < 55) {
-        wire = "8 AWG";
-      } else if (k7 < 75) {
-        wire = "6 AWG";
-      } else {
-        wire = "4 AWG";
-      }
-
-      // MOP logic
-      const mMax = Math.max(motor1, motor2);
-      const mMin = Math.min(motor1, motor2);
-      let t7 = 2.25 * mMax + mMin + heaterAmps;   // Before filters
-      let t9 = floorTo5(t7);                      // Filter 1
-      let t11 = t9 < totalMca ? totalMca : t9;    // Filter 2
-      let t12 = ceilTo5(t11);                     // Filter 3
-      let mop = t12 < 15 ? 15 : t12;              // Minimum 15 A
-
-      // Fuses
-      const heaterFuse = heaterMca < 15 ? 15 : ceilTo5(heaterMca);
-      const motorFuse = motorMca < 15 ? 15 : ceilTo5(motorMca);
-
-      // Update UI
-      document.getElementById("heaterAmps").textContent = heaterAmps.toFixed(2) + " A";
-      document.getElementById("motorAmps").textContent = motorTotal.toFixed(2) + " A";
-      document.getElementById("totalAmps").textContent = totalAmps.toFixed(2) + " A";
-
-      document.getElementById("heaterMca").textContent = heaterMca.toFixed(2) + " A";
-      document.getElementById("motorMca").textContent = motorMca.toFixed(2) + " A";
-      document.getElementById("totalMca").textContent = totalMca.toFixed(2) + " A";
-
-      document.getElementById("mop").textContent = Math.round(mop) + " A";
-      document.getElementById("heaterFuse").textContent = Math.round(heaterFuse) + " A";
-      document.getElementById("motorFuse").textContent = Math.round(motorFuse) + " A";
-      document.getElementById("wireSize").textContent = wire;
-    }
-
-    // Run once with defaults
-    runCalc();
-  </script>
-</body>
-</html>
+      } else if (k
